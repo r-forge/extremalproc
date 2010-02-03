@@ -1,0 +1,11 @@
+Package: ExtremalProc
+Version: 0.1
+Date: 2010-01-20
+Title: Modelling and Analysis of Extremal Processes.
+Author: Simone Padoan <simone.padoan@epfl.ch>
+Maintainer: Simone Padoan <simone.padoan@epfl.ch>
+Depends: R (>= 2.9.0)
+Description: Analysis of Extremal Processes.
+Suggests: RandomFields
+License: GPL Version 2 or later.
+URL: http://eflum.epfl.ch/people/padoan.en.php
