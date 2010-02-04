@@ -86,6 +86,9 @@ fExtremal(coord=NULL, corrmodel=NULL, data=NULL, fixed=list(nugget=0),
   \item{varcov}{The variance covariance matrix.}
 }
 \references{
+Davison, A. C. and Gholamrezaee, M. (2009), Geostatistics of extremes. \emph{Journal of the Royal Statistical
+Society, Series B}. To appear.
+
 Davison, A. C., Padoan, S. A. and Ribatet, M. (2010). Modelling of Spatial Extremes. \emph{Submitted}.
 
 Padoan, S. A. (2008) Computational Methods for Complex Problems in Extreme Value Theory. PhD Thesis. University of Padova.
@@ -94,10 +97,8 @@ Padoan, S. A. (2008) Computational Methods for Complex Problems in Extreme Value
 Padoan, S. A. Ribatet, M and Sisson, S. A. (2010). Likelihood-Based Inference for
 Max-Stable Processes. \emph{Journal of the American Statistical Association, Theory & Methods}.
 In press.
-
-Kabluchko, Z., Schlather, M., de Haan, L. (2009). Stationary max-stable fields associated to negative definite functions. \emph{Annals of Probability}, \bold{37}, 2042-2065.
-
 }
+
 \author{Simone Padoan, \email{simone.padoan@epfl.ch},
   \url{http://eflum.epfl.ch/people/padoan.en.php}}
 

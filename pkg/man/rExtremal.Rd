@@ -133,17 +133,18 @@ rExtremal(coord=NULL, corrmodel=NULL, fitted=NULL, grid=FALSE, model=NULL,
     is returned; the last dimension contains the realisations.
 }
 \references{
-  Davison, A. C., Padoan, S. A. and Ribatet, M. (2010). Modelling of
-  Spatial Extremes. \emph{Submitted}.
-
   Demarta, S. and McNeil, A. J. (2005). The t copula and related copulas
  \emph{International Statistical Review}, \bold{73}, 111-129.
   
   Husler, J. and Reiss, R. (1989). Maxima of normal random vectors:
   between independence and complete dependence
- \emph{Statistics and Probability Letters}, \bold{7}, 283--286.
+  \emph{Statistics and Probability Letters}, \bold{7}, 283--286.
 
- Nikoloulopoulos, A. K., H. Joe, and H. Li (2009). Extreme value properties of multivariate t
+   Kabluchko, Z., Schlather, M., de Haan, L. (2009). Stationary
+   max-stable fields associated 
+   to negative definite functions. \emph{Annals of Probability}, \bold{37}, 2042-2065.
+
+  Nikoloulopoulos, A. K., H. Joe, and H. Li (2009). Extreme value properties of multivariate t
  copulas. \emph{Extremes}, \bold{12}, 129--148.
 
  for Gaussian process simulations see \command{\link{RFMethods}}.
