@@ -13,16 +13,54 @@
 
 ### Procedures are in alphabetical order.
 
-fGev <- function(data, method='Nelder-Mead', std.err=FALSE)
+fGev <- function(data, method='Nelder-Mead', start, std.err=TRUE)
   {
+    param <- NULL
+    varcov <- NULL
+    
+    if(missing(data) || length(data) == 0 || !is.numeric(data))
+      stop('insert a numeric vector of data')
+    
     ### Starting values:
-    start <- c(1, 1, .01)
+    scale <- sqrt(6 * var(data)) / pi
+    location <- mean(data) - 0.58 * scale
+    shape <- 0
+
+    param <- list(location=location, scale=scale, shape=shape)
+    parnames <- c('location', 'scale', 'shape')
+
+    if(!missing(start))
+      {
+        if(!is.list(start))
+          stop('start need to be named list of starting values')
+
+        for(i in 1 : length(start))
+          {
+            namestart <- names(start[i])
+            if(!any(namestart == parnames))
+              stop('insert location, scale and shape as a named list')
+            
+            param[namestart] <- start[namestart]
+
+          }
+        
+        if(param$scale < 0)
+          param$scale <- scale
+      }
+
+    param <- as.numeric(param)
 
     ### fit the log-likelihood of the GEV model:
-    fitted <- optim(start, GevLoglik, data=data, method=method,
+    fitted <- optim(param, GevLoglik, data=data, method=method,
                     control=list(fnscale=-1, reltol=1e-14, maxit=1e8),
                     hessian=std.err)
-    return(fitted)
+
+    param <- fitted$par
+
+    if(std.err)
+      varcov <- - solve(fitted$hessian)
+    
+    return(list(param=fitted$par, varcov=varcov))
   }
 
 
@@ -74,4 +112,4 @@ GevLoglik <- function(data, param)
   }
 
 MLE <- function(x)
-  return(as.double(fGev(x)$par))
+  return(as.double(fGev(x)$param))
