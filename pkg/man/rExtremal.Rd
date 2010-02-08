@@ -7,8 +7,8 @@
   Extremal \emph{t} process is with Frechet marginals.
 }
 \usage{
-rExtremal(coord=NULL, corrmodel=NULL, fitted=NULL, grid=FALSE, model=NULL, 
-          numblock=NULL, numsim=NULL, param=NULL)
+rExtremal(coord, corrmodel, fitted=NULL, grid=FALSE, model,
+          numblock=300, numsim=1, param)
 } 
 \arguments{
   \item{coord}{A (\eqn{d \times 2}{d x 2})-matrix of coordinates of points

@@ -8,8 +8,8 @@
  Model parameters are those of the undelrying correlation function. The function allows  any parameters to be held fixed if desired.
   }
 \usage{
-fExtremal(coord=NULL, corrmodel=NULL, data=NULL, fixed=list(nugget=0),
-          method='L-BFGS-B', model=NULL, parscale=TRUE, start=NULL)
+fExtremal(coord, corrmodel, data, fixed=list(nugget=0),
+          method='L-BFGS-B', model, parscale=TRUE, start=NULL)
 }
 
 \arguments{
