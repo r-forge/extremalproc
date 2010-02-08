@@ -276,32 +276,32 @@ InitSimu <- function(corrmodel, model, numblock, numsim, param, coord)
 
     model <- CheckModel(model)
 
-    if(is.null(model))
+    if(missing(model))
       {
         error <- ('The name of the process is not correct\n')
         return(list(error=error))
       }
 
-    if(is.null(numsim))
+    if(missing(numsim))
       {
         error <- ('the sample size need to be a positive integer\n')
         return(list(error=error))
       }
     
-    if(!is.null(numsim))
+    if(!missing(numsim))
       if(any(numsim < 0, !is.numeric(numsim)))
         {
           error <- ('the sample size need to be a positive integer\n')
           return(list(error=error))
         }
 
-    if(is.null(coord) || !is.matrix(coord))
+    if(missing(coord) || !is.matrix(coord))
       {
         error <- ('insert a suitable set of coordinates\n')
         return(list(error=error))
       }
  
-    if(is.null(numblock))
+    if(missing(numblock))
       {
         error <- ('the block size need to be a positive integer\n')
         return(list(error=error))

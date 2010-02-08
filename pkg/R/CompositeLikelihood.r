@@ -37,53 +37,38 @@ CompLikelihood <- function(corrmodel, data, fixed, lags, model, numcoord, numdat
 
 ### Fit multivariate extremal models 
 
-fExtremal <- function(coord=NULL, corrmodel=NULL, data=NULL, fixed=list(nugget=0),
-                      method='L-BFGS-B', model=NULL, parscale=TRUE, start=NULL)
+fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0),
+                      method='L-BFGS-B', model, parscale=TRUE, start=NULL)
   {
+    ### Check the parameters given in input:
+    
+     if(missing(model) || is.null(model))
+       stop('The model inserted is not an Extremal process available\n')
+    
+    if(missing(corrmodel) || is.null(model))
+      stop('the model paramater/s need to be completely inserted\n')
+ 
+    if(missing(coord) || !is.matrix(coord))
+      stop('insert a suitable set of coordinates\n')
+     
+    if(missing(data) || !is.matrix(data))
+      stop('insert a suitable matrix of data\n')
+  
+    if(!is.null(start) & !is.list(start))
+      stop('insert starting values as a list of parameters\n')
+   
+    if(!is.null(fixed) & !is.list(fixed))
+      stop('insert fixed values as a list of parameters\n')
+
     ### Initialization global variables:
+     
     fExtremal <- NULL
     namemodel <- model
     namecorrmodel <- corrmodel
     model <- CheckModel(model)
     corrmodel <- CheckCorrModel(corrmodel)
 
-    ### Check the parameters given in input:
-     if(is.null(model))
-      {
-        cat('The model inserted is not a multivariate spatial model available\n')
-        return(fExtremal)
-      }
-    
-    if(is.null(corrmodel))
-      {
-        cat('the model paramater/s need to be completely inserted\n')
-        return(fExtremal)
-      }
-
-    if(is.null(coord) || !is.matrix(coord))
-      {
-        cat('insert a suitable set of coordinates\n')
-        return(fExtremal)
-      }
-    
-    if(is.null(data) || !is.matrix(data))
-      {
-        cat('insert a suitable matrix of data\n')
-        return(fExtremal)
-      }
-
-    if(!is.null(start) & !is.list(start))
-      {
-        cat('insert starting values as a list of parameters\n')
-        return(fExtremal)
-      }
-
-    if(!is.null(start) & !is.list(fixed))
-      {
-        cat('insert fixed values as a list of parameters\n')
-        return(fExtremal)
-      }
-
+  
     ### Initialization parameters:
     
     initparam <- InitParam(fixed, namecorrmodel, namemodel, parscale,

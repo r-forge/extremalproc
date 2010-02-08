@@ -15,8 +15,8 @@
 
 ### Simulation of extremal processes:
 
-rExtremal <- function(coord=NULL, corrmodel=NULL, fitted=NULL, grid=FALSE,
-                      model=NULL, numblock=NULL, numsim=NULL, param=NULL)
+rExtremal <- function(coord, corrmodel, fitted=NULL, grid=FALSE, model,
+                      numblock=300, numsim=1, param)
   {
     result <- NULL
 
@@ -27,7 +27,7 @@ rExtremal <- function(coord=NULL, corrmodel=NULL, fitted=NULL, grid=FALSE,
         model <- fitted$model
         param <- fitted$param
         
-        if(is.null(coord))
+        if(missing(coord))
           coord <- fitted$coord
 
         if(!is.null(fitted$fixed))
@@ -43,11 +43,8 @@ rExtremal <- function(coord=NULL, corrmodel=NULL, fitted=NULL, grid=FALSE,
     initsimu <- InitSimu(corrmodel, model, numblock, numsim, param, coord)
 
     if(!is.null(initsimu$error))
-      {
-        cat(initsimu$error)
-        return(result)
-      }
-
+      stop(initsimu$error)
+  
     numcoord <- numgrid <- nrow(coord)
     if(grid) numcoord <- numgrid^2
 
