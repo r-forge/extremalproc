@@ -13,11 +13,11 @@ rExtremal(coord, corrmodel, fitted=NULL, grid=FALSE, model,
 \arguments{
   \item{coord}{A (\eqn{d \times 2}{d x 2})-matrix of coordinates of points
     where the extremes are simulated. The column size represents the two
-    plane dimensions and the row size the number of points}
+    plane dimensions and the row size the number of points.}
   \item{coormodel}{correlation model of the underlying random field
-    (see \bold{Details} and \command{\link{CovarianceFct}} for a
+    (see \bold{Details} and \code{\link[RandomFields]{CovarianceFct}} for a
     complete description).}
-  \item{fitted}{An object of class \code{"Extremal"}; all the
+  \item{fitted}{An object of class \code{"extremal"}; all the
     informations are taken from the list of components of the fitted
     model (see \bold{Details}).}
   \item{grid}{Logical; if \code{FALSE} (the default) the vector \code{coord},
@@ -31,7 +31,7 @@ rExtremal(coord, corrmodel, fitted=NULL, grid=FALSE, model,
   \item{numsim}{Number of independent realisations to generate.}
   \item{param}{A named list giving the values for the parameters;
     the parameters are given depending by the parametrised class of
-    correlation functions (see \bold{Details} and \command{\link{CovarianceFct}}).
+    correlation functions (see \bold{Details} and \code{\link[RandomFields]{CovarianceFct}}).
     An example may be \code{param=list(mean=0, nugget=0, scale=10,...)}.}
 }
 \details{
@@ -155,10 +155,10 @@ rExtremal(coord, corrmodel, fitted=NULL, grid=FALSE, model,
 
 
 \seealso{
-  \command{\link{fExtremal}},
-  \command{\link{CovarianceFct}},
-  \command{\link{GaussRF}},
-  \code{\link{RandomFields}}.
+  \code{\link{fExtremal}},
+  \code{\link[RandomFields]{CovarianceFct}},
+  \code{\link[RandomFields]{GaussRF}},
+  \code{\link[RandomFields]{RandomFields}}.
 }
 
 \examples{
