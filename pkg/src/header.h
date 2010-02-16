@@ -56,14 +56,19 @@ Description: procedures for computation of gradients quantities
 Start
  ---------------------------------------------------------------*/
 
+void Gradient(int *corrmod, double *data, double *eps, int *flag, 
+	      double *lags, int *model, int *ndata, int *nflag, 
+	      int *npar, int *nsite, double *par, double *gradient);
+
 void Gradient_g(double corr, double *gradcorr,  int ngrcor, 
 		double u, double v, double *gradient);
 
 void Gradient_t(double corr, int flagc, double *gradcorr, double df, 
 		int flagdf, int ngrcor, double u, double v, double *gradient);
 
-void SquaredScore(int *corrmod, double *data, double *eps, int *flag, double *lags, int *model, 
-		  int *ndata, int *nflag, int *nsite, int *nsqsc, double *par, double *sqscore);
+void SquaredScore(int *corrmod, double *data, double *eps, int *flag, double *lags, 
+		  int *model, int *ndata, int *nflag, int *npar, int *nsite,  
+		  double *par, double *varmat);
 
 
 /*----------------------------------------------------------------

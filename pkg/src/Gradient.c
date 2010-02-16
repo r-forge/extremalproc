@@ -1,5 +1,59 @@
 #include "header.h"
 
+// Gradient of the Extremal models:
+
+void Gradient(int *corrmod, double *data, double *eps, int *flag, 
+	      double *lags, int *model, int *ndata, int *nflag, 
+	      int *npar, int *nsite, double *par, double *result)
+{
+  int flagc=0, h=0, i=0, j=0, k=0, m=0, n=0, ngcorr=0;
+  double corr, df, *grad, *grc;
+
+  df = par[0];
+  ngcorr = *npar;
+  if(flag[0] == 1) ngcorr = ngcorr - 1;
+
+  for(i = 1; i < *nflag; i++)
+    flagc = flagc + flag[i];
+
+  grc = (double *) R_alloc(ngcorr, sizeof(double));
+  grad = (double *) R_alloc(*npar, sizeof(double));
+
+  for(i = 0; i < *npar; i++)
+        result[i] = 0;
+
+  for(n = 0; n < *ndata; n++)
+    {
+      h = 0;
+
+      for(i = 0; i < (*nsite - 1); i++)
+        for(j = (i + 1); j < *nsite; j++)
+	  {
+	    corr = CorrelationFct(corrmod, lags[h], model, par);
+	    GradientCorrFct(corr, corrmod, eps, flag, grc, lags[h], model, par);
+	    switch(*model)
+	      {
+	      case 1:// Extremal Gaussian process
+		Gradient_g(corr, grc, ngcorr, data[(n + i * *ndata)], 
+			   data[(n + j * *ndata)], grad);
+		break;
+	      case 2:// Extremal t process
+		Gradient_t(corr, flagc, grc, df, flag[0], ngcorr, 
+			   data[(n + i * *ndata)], data[(n + j * *ndata)], grad);
+		break;
+	      }
+	    // Summation of the pairwise gradients:
+	    for(m = 0; m < *npar; m++)
+	      result[m] = result[m] + grad[m];
+
+	    h++;
+	  }
+    }
+
+  return;
+}
+ 
+
 // Bivariate gradient of Extremal Gaussian model:
 
 void Gradient_g(double corr, double *gradcorr,  int ngrcor, 
@@ -212,32 +266,30 @@ void Gradient_t(double corr, int flagc, double *gradcorr, double df,
   return;
 }
 
-void SquaredScore(int *corrmod, double *data, double *eps, int *flag, double *lags, int *model, 
-		  int *ndata, int *nflag, int *nsite, int *nsqsc, double *par, double *sqscore)
+void SquaredScore(int *corrmod, double *data, double *eps, int *flag, double *lags, 
+		  int *model, int *ndata, int *nflag, int *npar, int *nsite, 
+		  double *par, double *varmat)
 {
-  int flagc=0, h=0, i=0, j=0, m=0, n=0, ngcorr=0, npair=0;
+  int flagc=0, h=0, i=0, j=0, k=0, m=0, n=0, ngcorr=0, snpar=0;
   double corr, df, *grad, *gradient, *grc;
 
   df = par[0];
-  ngcorr = *nsqsc;
+  ngcorr = *npar;
   if(flag[0] == 1) ngcorr = ngcorr - 1;
+
+  snpar = pow(*npar, 2);
 
   for(i = 1; i < *nflag; i++)
     flagc = flagc + flag[i];
 
-  npair = *nsite * (*nsite - 1) / 2;
   grc = (double *) R_alloc(ngcorr, sizeof(double));
-  grad = (double *) R_alloc(*nsqsc, sizeof(double));
-  gradient = (double *) R_alloc(*nsqsc, sizeof(double));
-
-  for(i = 0; i < *nsqsc; i++)
-    for(j = 0; j < *nsqsc; j++)
-      sqscore[i * *nsqsc + j] = 0;
+  grad = (double *) R_alloc(*npar, sizeof(double));
+  gradient = (double *) R_alloc(*npar, sizeof(double));
 
   for(n = 0; n < *ndata; n++)
     {
       h = 0;
-      for(i = 0; i < *nsqsc; i++)
+      for(i = 0; i < *npar; i++)
         gradient[i] = 0;
 
       for(i = 0; i < (*nsite - 1); i++)
@@ -256,16 +308,22 @@ void SquaredScore(int *corrmod, double *data, double *eps, int *flag, double *la
 			   data[(n + i * *ndata)], data[(n + j * *ndata)], grad);
 		break;
 	      }
+	    // Set the sensitivity matrix:
+	    for(m = 0; m < *npar; m++)
+	      {
+		gradient[m] = gradient[m] + grad[m];
 
-	    for(m = 0; m < *nsqsc; m++)
-	      gradient[m] = gradient[m] + grad[m];
+		for(k = 0; k < *npar; k++)
+		  varmat[m * *npar + k] = varmat[m * *npar + k] +
+		    grad[m] * grad[k];
+	      }
 
 	    h++;
 	  }
-
-      for(i = 0; i < *nsqsc; i++)
-	for(j = 0; j < *nsqsc; j++)
-	  sqscore[i * *nsqsc + j] = sqscore[i * *nsqsc + j] + 
+      // Set the variability matrix:
+      for(i = 0; i < *npar; i++)
+	for(j = 0; j < *npar; j++)
+	  varmat[(i * *npar + j) + snpar] = varmat[(i * *npar + j) + snpar] + 
 	    gradient[i] * gradient[j];
 
     }
