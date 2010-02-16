@@ -37,9 +37,31 @@ CompLikelihood <- function(corrmodel, data, fixed, lags, model, numcoord, numdat
 
 ### Fit multivariate extremal models 
 
-fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0),
+fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0), hessian=TRUE,
                       method='L-BFGS-B', model, parscale=TRUE, start=NULL)
-  {
+{
+    call <- match.call()
+    
+    ### Check the parameters given in input:
+
+    if(missing(model) || is.null(model))
+       stop('The model inserted is not an Extremal process available\n')
+    
+    if(missing(corrmodel) || is.null(model))
+      stop('the model paramater/s need to be completely inserted\n')
+ 
+    if(missing(coord) || !is.matrix(coord))
+      stop('insert a suitable set of coordinates\n')
+     
+    if(missing(data) || !is.matrix(data))
+      stop('insert a suitable matrix of data\n')
+  
+    if(!is.null(start) & !is.list(start))
+      stop('insert starting values as a list of parameters\n')
+   
+    if(!is.null(fixed) & !is.list(fixed))
+      stop('insert fixed values as a list of parameters\n')
+
     ### Check the parameters given in input:
     
      if(missing(model) || is.null(model))
@@ -103,26 +125,8 @@ fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0),
                       numcoord=numcoord, numdata=numdata, control=list(fnscale=-1,
                       reltol=1e-14, maxit=1e8, parscale=initparam$parscale), hessian=TRUE)
 
-### Start computation of the variance-covariance matrix:
+    ### Some checks of the output from the optimization procedure:
 
-    param <- c(fitted$par, initparam$fixed)
-    param <- param[sort(names(param))]
-    eps <- (.Machine$double.eps)^(1/3)
-    numflag <- initparam$numparam + initparam$numfixed
-    
-    squaredscore <- .C('SquaredScore', as.integer(corrmodel), as.double(unifdata),
-                       as.double(eps), as.integer(initparam$flag), as.double(lags),
-                       as.integer(model), as.integer(numdata), as.integer(numflag),
-                       as.integer(numcoord), as.integer(initparam$numparam),
-                       as.double(param), sqscore=double(length=initparam$numparam^2),
-                       PACKAGE='ExtremalProc', DUP = FALSE, NAOK=TRUE)$sqscore
-
-    squaredscore <- matrix(squaredscore, ncol=initparam$numparam,
-                           nrow=initparam$numparam)
-    ### End computation of the variance covariance matrix
-    
-    ihessian <- try(solve(fitted$hessian), silent = TRUE)
-    
     if(fitted$convergence == 0)
       fitted$convergence <- 'Successful'
     else
@@ -131,7 +135,35 @@ fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0),
       else
         fitted$convergence <- "Optimization may have failed"
 
-    if(!is.matrix(ihessian) || !is.matrix(squaredscore))
+
+    ### Start computation of the variance-covariance matrix:
+
+    param <- c(fitted$par, initparam$fixed)
+    param <- param[sort(names(param))]
+    eps <- (.Machine$double.eps)^(1/3)
+    numflag <- initparam$numparam + initparam$numfixed
+    dimvar <- initparam$numparam^2
+    vsmat <- double(2 * dimvar)
+    
+    .C('SquaredScore', as.integer(corrmodel), as.double(unifdata),
+       as.double(eps), as.integer(initparam$flag), as.double(lags),
+       as.integer(model), as.integer(numdata), as.integer(numflag),
+       as.integer(initparam$numparam), as.integer(numcoord),
+       as.double(param), vsmat, PACKAGE='ExtremalProc',
+       DUP = FALSE, NAOK=TRUE)
+
+    # Set sensitivity matrix:
+    sensmat <- matrix(vsmat[1 : dimvar], ncol=initparam$numparam)
+    # Set variability matrix:
+    varmat <- matrix(vsmat[(dimvar + 1) : (2 * dimvar)],
+                        ncol=initparam$numparam)
+
+    if(hessian)
+      sensmat <- -fitted$hessian
+    
+    isensmat <- try(solve(sensmat), silent = TRUE)
+    
+    if(!is.matrix(isensmat) || !is.matrix(varmat))
       {
         warning("observed information matrix is singular")
         varcov <- 'none'
@@ -139,10 +171,10 @@ fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0),
       }
     else
       {
-        penalty <- squaredscore %*% ihessian
+        penalty <- varmat %*% isensmat
         CLIC <- -2 * (fitted$value - sum(diag(penalty)))
-        varcov <- ihessian %*% penalty
-        dimnames(varcov) <- list(initparam$namesparam, initparam$namesparam)
+        varcov <- isensmat %*% penalty
+        dimnames(varcov) <- dimnames(sensmat) <- dimnames(varmat) <- list(initparam$namesparam, initparam$namesparam)
         std.err <- diag(varcov)
         if(any(std.err < 0))
           std.err <- 'none'
@@ -152,7 +184,10 @@ fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0),
             names(std.err) <- initparam$namesparam
           }
       }
-    
+
+    ### End computation of the variance covariance matrix
+
+     
     fExtremal <- list(CLIC = CLIC,
                       coord = coord,
                       convergence = fitted$convergence,
@@ -164,35 +199,39 @@ fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0),
                       message = fitted$message,
                       model = namemodel,
                       param = fitted$par,
+                      sensmat = sensmat,
                       std.err = std.err,
-                      varcov = varcov)
+                      unifdata = unifdata,
+                      varcov = varcov,
+                      varmat = varmat)
 
-    class(fExtremal) <- "Extremal"
-
-    return(fExtremal)
+    structure(c(fExtremal, call = call), class = c("extremal"))
   }
 
 ### Summary of fitted models:
 
-summary.Extremal <- function(fitted)
+print.extremal <- function(x, digits = max(3, getOption("digits") - 3), ...)
   {
-    numdata <- nrow(fitted$data)
-    numcoord <- ncol(fitted$data)
-    numparam <- length(fitted$param)
+    numdata <- nrow(x$data)
+    numcoord <- ncol(x$data)
+    numparam <- length(x$param)
 
     cat('\nResults of fitting Extremal processes.\n')
-    cat('\nModel: ', fitted$model, '\n')
-    cat('Covariance model: ', fitted$corrmodel, '\n')
+    cat('\nModel: ', x$model, '\n')
+    cat('Covariance model: ', x$corrmodel, '\n')
     cat('Number of coordinates: ', numcoord, '\n')
     cat('Number of observation per location: ', numdata, '\n\n')
-    cat('Log composite likelihood:      ', fitted$logLik, '\n')
-    cat('Composite likelihood criterion: ', fitted$CLIC,'\n')
+    cat('Log composite likelihood:      ', x$logLik, '\n')
+    cat('Composite likelihood criterion: ', x$CLIC,'\n')
     cat('\nEstimated parameters:\n')
-    print(fitted$param)
+    print.default(format(x$param, digits = digits), print.gap = 2, 
+        quote = FALSE)
     cat('\nStandard errors:\n')
-    print(fitted$std.err)
+    print.default(format(x$std.err, digits = digits), print.gap = 2, 
+        quote = FALSE)
     cat('\nVariance-covariance matrix of the estimates:\n')
-    print(fitted$varcov)
-
+    print.default(format(x$varcov, digits = digits), print.gap = 3,
+                  quote = FALSE)
+    invisible(x)
   }
 

@@ -23,6 +23,9 @@ rExtremal <- function(coord, corrmodel, fitted=NULL, grid=FALSE, model,
     ### In case the input is passed as fitted model: 
     if(!is.null(fitted))
       {
+        if(!inherits(fitted, "extremal"))
+          stop("Use only with 'extremal' objects")
+        
         corrmodel <- fitted$corrmodel        
         model <- fitted$model
         param <- fitted$param
