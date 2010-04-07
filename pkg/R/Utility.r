@@ -6,7 +6,7 @@
 ### Description:
 ### This file contains a set of procedures
 ### for supporting all the other functions.
-### Last change: 20/01/2010.
+### Last change: 01/04/2010.
 ####################################################
 
 
@@ -103,7 +103,30 @@ CheckParamRange <- function(param)
   }
 
 
-InitParam <- function(fixed, corrmodel, model, parscale, paramrange, start)
+CorrelationParam <- function(corrmodel)
+  {
+    namesparam <- NULL
+    
+    if(corrmodel=='cauchy')
+      namesparam <- c('power2', 'scale')
+    
+    if(corrmodel=='exponential' || corrmodel=='gauss')
+      namesparam <- c('scale')
+
+    if(corrmodel=='gencauchy')
+      namesparam <- c('power1', 'power2','scale')
+
+    if(corrmodel=='stable')
+      namesparam <- c('power', 'scale')
+
+    if(corrmodel=='whittlematern')
+      namesparam <- c('scale', 'smooth')
+
+    return(namesparam)
+  }
+
+
+InitParam <- function(corrmodel, fixed, model, parscale, paramrange, start)
   {    
     ### Parameters initalization:
     error <- NULL
@@ -112,42 +135,11 @@ InitParam <- function(fixed, corrmodel, model, parscale, paramrange, start)
     scale <- 10
     numfixed <- numstart <- 0
 
-    if(corrmodel=='cauchy')
-      {
-        param <- c(nugget, smooth, scale)
-        namesparam <- c('nugget', 'power2', 'scale')
-      }
-    
-    if(corrmodel=='exponential' || corrmodel=='gauss')
-      {
-        param <- c(nugget, scale)
-        namesparam <- c('nugget', 'scale')
-      }
-
-    if(corrmodel=='gencauchy')
-      {
-        param <- c(nugget, smooth, smooth, scale)
-        namesparam <- c('nugget', 'power1', 'power2','scale')
-
-        if(model=='Extremal_g')
-          if(is.list(fixed)) fixed$power2 <- 1 else fixed <- list(power2=1)
-      }
-
-    if(corrmodel=='stable')
-      {
-        param <- c(nugget, smooth, scale)
-        namesparam <- c('nugget', 'power', 'scale')
-      }
-
-    if(corrmodel=='whittlematern')
-      {
-        param <- c(nugget, scale, smooth)
-        namesparam <- c('nugget', 'scale', 'smooth')
-      }
-
-    param <- c(df, param)
-    namesparam <- c('df', namesparam)
+    param <- c(df, nugget, rep(smooth, 3), scale, smooth)
+    namesparam <- c("df", "nugget", "power", "power1", "power2", "scale", "smooth")
     names(param) <- namesparam
+    namesparam <- sort(namesparam[namesparam %in% c("df", "nugget", CorrelationParam(corrmodel))])
+    param <- param[namesparam]
 
     if(model=='Extremal_g')
       if(is.list(fixed)) fixed$df <- df else fixed <- list(df=df)
@@ -397,6 +389,24 @@ RescalingCoord <- function(corrmodel, numblock, param, coord)
       coordscaled <- coord / (log(numblock))^(1 / param[5])
     
     return(coordscaled)
+  }
+
+RescalingScale <- function(corrmodel, numblock, param)
+  {
+    
+    if(corrmodel=='exponential')
+      param[4] <- param[4] * log(numblock)
+
+    if(corrmodel=='gauss')
+      param[4] <- param[4] * sqrt(log(numblock))
+    
+    if(corrmodel=='stable')
+      param[4] <- param[4] * (log(numblock))^(1 / param[5])
+ 
+    if(corrmodel=='gencauchy')
+      param[4] <- param[4] * (log(numblock))^(1 / param[5])
+    
+    return(param)
   }
 
     

@@ -7,7 +7,7 @@
 ### This file contains a set of procedures
 ### for the simulation of extremal processes and
 ### related functions.
-### Last change: 21/01/2010.
+### Last change: 01/04/2010.
 ####################################################
 
 
@@ -59,13 +59,13 @@ rExtremal <- function(coord, corrmodel, fitted=NULL, grid=FALSE, model,
     ### Simulation of Extremal-Gaussian random fields: 
     if(model=='Extremal_g')
       {
-        coordresc <- RescalingCoord(corrmodel, numblock, initsimu$corrparam, coord)
+        initsimu$corrparam <- RescalingScale(corrmodel, numblock, initsimu$corrparam)
         
         for(i in 1 : numsim)
           {
             replicates <- double(numcoord)
             ### Simulation Gaussian random field:
-            gaussrf <- GaussRF(x = coordresc[, 1], y = coordresc[, 2], model = corrmodel,
+            gaussrf <- GaussRF(x = coord[, 1], y = coord[, 2], model = corrmodel,
                                param = initsimu$corrparam, grid = grid, n = numblock, pch='')
             
             ### Compute compotentwise maxima:

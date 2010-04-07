@@ -61,27 +61,7 @@ fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0), hessian=TRUE
    
     if(!is.null(fixed) & !is.list(fixed))
       stop('insert fixed values as a list of parameters\n')
-
-    ### Check the parameters given in input:
-    
-     if(missing(model) || is.null(model))
-       stop('The model inserted is not an Extremal process available\n')
-    
-    if(missing(corrmodel) || is.null(model))
-      stop('the model paramater/s need to be completely inserted\n')
  
-    if(missing(coord) || !is.matrix(coord))
-      stop('insert a suitable set of coordinates\n')
-     
-    if(missing(data) || !is.matrix(data))
-      stop('insert a suitable matrix of data\n')
-  
-    if(!is.null(start) & !is.list(start))
-      stop('insert starting values as a list of parameters\n')
-   
-    if(!is.null(fixed) & !is.list(fixed))
-      stop('insert fixed values as a list of parameters\n')
-
     ### Initialization global variables:
      
     fExtremal <- NULL
@@ -93,7 +73,7 @@ fExtremal <- function(coord, corrmodel, data, fixed=list(nugget=0), hessian=TRUE
   
     ### Initialization parameters:
     
-    initparam <- InitParam(fixed, namecorrmodel, namemodel, parscale,
+    initparam <- InitParam(namecorrmodel, fixed, namemodel, parscale,
                            method=='L-BFGS-B', start)
 
     if(!is.null(initparam$error))
