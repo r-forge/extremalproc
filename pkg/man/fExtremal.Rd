@@ -13,7 +13,7 @@ fExtremal(coord, corrmodel, data, fixed=list(nugget=0), hessian=TRUE,
 \arguments{
   \item{coord}{A (\eqn{n \times 2}{n x 2})-matrix of coordinates (where
     \eqn{n} is the number coordinates), or vector (\eqn{n \times 1}{n x 1}) of coordinates.}
-  \item{coormodel}{String; the name of a correlation model, see for a complete description Section \bold{Details} and
+  \item{corrmodel}{String; the name of a correlation model, see for a complete description Section \bold{Details} and
     \code{\link[RandomFields]{CovarianceFct}} from the package \code{\link[RandomFields]{RandomFields}}.}
   \item{data}{Matrix of values measured at coordinates \code{coord};
     columns represent the data collected at the different locations,

@@ -14,7 +14,7 @@ rExtremal(coord, corrmodel, fitted=NULL, grid=FALSE, model,
   \item{coord}{A (\eqn{d \times 2}{d x 2})-matrix of coordinates of points
     where the extremes are simulated. The column size represents the two
     plane dimensions and the row size the number of points.}
-  \item{coormodel}{correlation model of the underlying random field
+  \item{corrmodel}{correlation model of the underlying random field
     (see \bold{Details} and \code{\link[RandomFields]{CovarianceFct}} for a
     complete description).}
   \item{fitted}{An object of class \code{"extremal"}; all the

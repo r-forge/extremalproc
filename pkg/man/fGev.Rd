@@ -26,11 +26,9 @@ If \code{start} is omitted the routine is computing the
 
 \value{
   The returned object is a list with:
-  \itemize{
-    \item \code{param}, the vector of  parameters' estimates;
-    \item \code{varcov} the matrix of the variance-covariance of
-    the estimates.
-    }
+  
+    \item{param}{the vector of  parameters' estimates.}
+    \item{varcov}{the matrix of the variance-covariance of the estimates.}
 }
 
 \references{
